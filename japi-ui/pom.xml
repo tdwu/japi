@@ -15,7 +15,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.pm</groupId>
+            <groupId>io.github.tdwu</groupId>
             <artifactId>japi-spring-web</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
