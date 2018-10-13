@@ -13,6 +13,10 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/japi-annotations/pom.xml" />
+        <option value="$PROJECT_DIR$/japi-core/pom.xml" />
+        <option value="$PROJECT_DIR$/japi-demo/pom.xml" />
+        <option value="$PROJECT_DIR$/japi-spring-web/pom.xml" />
+        <option value="$PROJECT_DIR$/japi-ui/pom.xml" />
       </set>
     </option>
   </component>
