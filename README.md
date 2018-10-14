@@ -1,26 +1,45 @@
 
->启动之前分析了swagger2，功能非常非常强大，比较偏向于rest风格，但不太满足公司项目的需求：
+>######启动之前分析了swagger2，功能非常非常强大，比较偏向于rest风格，但不太满足公司项目的需求：
 - 1 code通过http status来表示，而不是在response body 的json中标识
 - 2 rest要求并期望用户定义实体，而项目中往往一个参数只有一个id和name，参数太少不太愿意构建实体
 - 3 如果不定义实体，无法描述再swagger的ApiParam中描述{name:李老师,address:{city:,prov:}}结构信息
 - 4 请求和返回格式，是需要添加共同的json格式，数据只是在json的data中传递，如{code:0,message:"",data{}};
 
 
->设计初衷是简单，适合项目需求的api辅助工具，大致如下：
+
+
+>######设计初衷是简单，适合项目需求的api辅助工具，大致如下：
 - 1 在开发一个接口时，通过注解方式将接口信息添加在接口上
 - 2 通过一个web模块，查询出所有api的json格式的描述数据
 - 3 通过ui在展示json的数据，供前端人员使用
 
-> 由于人力投入有限，目前只提供了html方式查看，spring mvc的接口开发。
+>######由于人力投入有限，目前只提供了html方式查看，spring mvc的接口开发。
 功能目前还不是很全面，但比较适合我们公司的大部分项目使用场景和方式。
 
 
 没有最好的框架，只有最适合的。如果你觉得用得顺手，并希望优化下去，欢迎加入..
 
->使用方式 
+>######使用方式*
 
- (```)
-     
+导入依赖
+
+ ```xml
+    <dependencies>
+        <dependency>
+            <groupId>io.github.tdwu</groupId>
+            <artifactId>japi-core</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.tdwu</groupId>
+            <artifactId>japi-ui</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+    </dependencies>    
+ ```
+ 
+ ```java
+      
     @RestController
     @RequestMapping("/api/user/info")
     @Api(value = "登录", tags = "演示", module = "测试-用户模块")
@@ -50,10 +69,10 @@
         public ResultEntity<IPageBean<UserToken>> selectPageBeanAll(@RequestBody JSONObject jsonObject) throws Exception {
             return ResultEntity.success();
         } 
-    }
- (```) 
+    }    
+ ```
  
- (```) 
+ ```java
         
     @RestController
     @RequestMapping("/api/user/info")
@@ -78,15 +97,19 @@
         @PostMapping(value = "/getInfo2")
         public ResultEntity<Long[]> getInfo2(@RequestBody JSONObject jsonObject) throws Exception {
             return ResultEntity.success();
-        }
-    
-    }
- (```) 
+        }    
+    }    
+ ``` 
  
+ >api接口文档访问地址：/japi/index.html
  
->效果
+>效果:
+
+![blockchain](./src/main/resources/images/1.png "")
+
+![blockchain](./src/main/resources/images/2.png "")
+
 ![blockchain](./src/main/resources/images/3.png "")
 
 ![blockchain](./src/main/resources/images/4.png "")
 
-![blockchain](./src/main/resources/images/5.png "")
