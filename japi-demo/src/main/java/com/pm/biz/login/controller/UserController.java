@@ -32,7 +32,7 @@ public class UserController {
             , params = {@ApiParam(value = "$sex", type = UserInfo.class, note = "引用bean里面的一个字段")
             , @ApiParam(value = "sex1 ", type = UserSex.class)
             , @ApiParam(value = "user.$sex", type = UserInfo.class, note = "引用bean里面的一个字段")
-            , @ApiParam(value = "user.token", type = UserToken.class, note = "引用bean里面的一个字段")})
+            , @ApiParam(value = "user.token", type = UserToken.class, note = "引用bean")})
     @PostMapping(value = "/getInfo2")
     public ResultEntity<Long[]> getInfo2(@RequestBody JSONObject jsonObject) throws Exception {
         return ResultEntity.success();
