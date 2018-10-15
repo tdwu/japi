@@ -10,8 +10,8 @@ import com.pm.japi.spring.provider.WebRequestHandlerProvider;
 import com.pm.japi.utils.PathUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
@@ -37,70 +37,77 @@ public class ApiDocumentationScanner {
 
             //方法上的注解
             ApiMethod apiMethod = p.getHandlerMethod().getMethod().getAnnotation(ApiMethod.class);
+            RequestMappingInfo requestMapping = p.getRequestMapping();
+            String[] urls = requestMapping.getPatternsCondition().getPatterns().toArray(new String[0]);
+
             //由于spring注解中，path和value是别名关系，防止开发人员2种方式都在写，所以需要utils帮忙2边都有值
-            RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getMethod(), RequestMapping.class);
-            PostMapping post = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getMethod(), PostMapping.class);
+
 
             //获取方法对应的url
-            Method method = null;
-            if (mapping != null) {
-                method = new Method();
-                method.setPath(mapping.path()[0]);//暂时用第一个
-            } else if (post != null) {
-                method = new Method();
-                method.setPath(post.path()[0]);//暂时用第一个
+            if (urls == null || urls.length == 0) {
+                return;
             }
 
-            if (method != null) {
-                method.setName(apiMethod.value());
-                method.setNote(apiMethod.note());
-
-                //请求的参数
-                List<ApiParam> apiParamList = Arrays.asList(apiMethod.params());
-                List<Param> paramList = parse(modelProvider, apiParamList);
-                method.setParamList(paramList);
-
-                //返回的参数
-                List<ApiParam> apiResultList = Arrays.asList(apiMethod.result());
-                List<Param> resultList = parse(modelProvider, apiResultList);
-                method.setResultList(resultList);
-
-                //Controller上的api描述
-                Api api = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getBeanType(), Api.class);
-                String apiClassName = p.getHandlerMethod().getBeanType().getName();
-                ApiInfo apiInfo = apiMap.get(apiClassName);
-                if (apiInfo == null) {
-                    apiInfo = new ApiInfo();
-                    apiInfo.setModule(api.module());
-                    apiInfo.setName(api.value());
-                    apiInfo.setHidden(api.hidden());
-                    apiInfo.setTags(api.tags());
-
-                    // Controller上的path
-                    RequestMapping cr = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getBeanType(), RequestMapping.class);
-                    apiInfo.setBasePath(cr.path()[0]);
-
-                    apiMap.put(apiClassName, apiInfo);
+            Method method = new Method();
+            Set<RequestMethod> mds = requestMapping.getMethodsCondition().getMethods();
+            String mdStr = "";
+            for (RequestMethod rm : mds) {
+                if (StringUtils.isNotBlank(mdStr)) {
+                    mdStr = mdStr + "," + rm.name();
                 } else {
-                    apiMap.get(apiClassName);
+                    mdStr = mdStr + "  " + rm.name();
                 }
+            }
 
+            method.setType(mdStr);
+
+            method.setName(apiMethod.value());
+            method.setNote(apiMethod.note());
+
+            //请求的参数
+            List<ApiParam> apiParamList = Arrays.asList(apiMethod.params());
+            List<Param> paramList = parse(modelProvider, apiParamList);
+            method.setParamList(paramList);
+
+            //返回的参数
+            List<ApiParam> apiResultList = Arrays.asList(apiMethod.result());
+            List<Param> resultList = parse(modelProvider, apiResultList);
+            method.setResultList(resultList);
+
+            //Controller上的api描述
+            Api api = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getBeanType(), Api.class);
+            String apiClassName = p.getHandlerMethod().getBeanType().getName();
+            ApiInfo apiInfo = apiMap.get(apiClassName);
+            if (apiInfo == null) {
+                apiInfo = new ApiInfo();
+                apiInfo.setModule(api.module());
+                apiInfo.setName(api.value());
+                apiInfo.setHidden(api.hidden());
+                apiInfo.setTags(api.tags());
+
+                apiMap.put(apiClassName, apiInfo);
+            } else {
+                apiMap.get(apiClassName);
+            }
+
+
+            //返回参数类型处理
+            Type returnType = p.getHandlerMethod().getMethod().getGenericReturnType();
+            modelProvider.addType(returnType, null);
+            method.setReturnType(returnType.getTypeName());
+
+            //处理请求的参数类型
+            if (!ApiMethod.class.equals(apiMethod.paramType())) {
+                //不是默认的，说明是设置过的，则需要处理
+                modelProvider.addType(apiMethod.paramType(), null);
+                method.setParamType(apiMethod.paramType().getTypeName());
+            }
+
+            for (String url : urls) {
+                Method fMethod = method.clone();
+                fMethod.setPath(url);
                 //方法接口地址叠加
-                method.setPath(apiInfo.getBasePath() + method.getPath());
-                apiInfo.getMethodList().add(method);
-
-                //返回参数类型处理
-                Type returnType = p.getHandlerMethod().getMethod().getGenericReturnType();
-                modelProvider.addType(returnType, null);
-                method.setReturnType(returnType.getTypeName());
-
-                //处理请求的参数类型
-                if (!ApiMethod.class.equals(apiMethod.paramType())) {
-                    //不是默认的，说明是设置过的，则需要处理
-                    modelProvider.addType(apiMethod.paramType(), null);
-                    method.setParamType(apiMethod.paramType().getTypeName());
-                }
-
+                apiInfo.getMethodList().add(fMethod);
             }
         });
 
@@ -147,7 +154,7 @@ public class ApiDocumentationScanner {
             // 判断是否有引用的字段
             int filedIndex = param.getName().indexOf("$");
             if (filedIndex >= 0) {
-                field = param.getName().substring(filedIndex+1);
+                field = param.getName().substring(filedIndex + 1);
                 param.setName(param.getName().replace("$", ""));
             }
 
@@ -202,7 +209,7 @@ public class ApiDocumentationScanner {
                 Param parent = new Param();
                 parent.setName(name);
                 parent.setFrom(child.getFrom());
-                parent.setType("$"+Object.class.getTypeName());
+                parent.setType("$" + Object.class.getTypeName());
 
                 pt.getProperties().add(parent);
 
@@ -214,7 +221,7 @@ public class ApiDocumentationScanner {
                 Param parent = new Param();
                 parent.setName(path);
                 parent.setFrom(child.getFrom());
-                parent.setType("$"+Object.class.getTypeName());
+                parent.setType("$" + Object.class.getTypeName());
 
                 paramMap.put(path, parent);
                 paramList.add(parent);

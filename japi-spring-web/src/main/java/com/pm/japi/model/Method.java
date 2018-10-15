@@ -6,10 +6,11 @@ public class Method {
     private String path;
     private String name;
     private String note;
+    private String type;//方法名称,Post,Get 等
     private String paramType;
-    private List<Param> paramList=null;//请求参数
+    private List<Param> paramList = null;//请求参数
     private String returnType;
-    private List<Param> resultList=null;//对returnType的描述
+    private List<Param> resultList = null;//对returnType的描述
 
     public String getPath() {
         return path;
@@ -25,6 +26,14 @@ public class Method {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getNote() {
@@ -66,4 +75,17 @@ public class Method {
     public void setResultList(List<Param> resultList) {
         this.resultList = resultList;
     }
+
+    public Method clone() {
+        Method fMethod = new Method();
+        fMethod.setType(this.getType());
+        fMethod.setName(this.getName());
+        fMethod.setNote(this.getNote());
+        fMethod.setParamType(this.getParamType());
+        fMethod.setParamList(this.getParamList());
+        fMethod.setReturnType(this.getReturnType());
+        fMethod.setResultList(this.getResultList());
+        return fMethod;
+    }
+
 }
