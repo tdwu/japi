@@ -9,10 +9,7 @@ import com.pm.biz.login.model.enums.UserStatus;
 import com.pm.japi.annotations.Api;
 import com.pm.japi.annotations.ApiMethod;
 import com.pm.japi.annotations.ApiParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -42,7 +39,7 @@ public class LoginController {
             , paramType = UserInfo.class
             ,params = {@ApiParam(value = "team.id", note = "所属团队id，这是补充的一个参数"), @ApiParam(value = "team.status", type = UserStatus.class, note = "团队状态")}
             ,result = {@ApiParam(value = "data.sysCode", note = "当XXX情况下，存在（补充说明）")})
-    @PostMapping(value = "/selectPageBeanAll")
+    @RequestMapping(value = {"/selectPageBeanAllPost","/selectPageBeanAllGet"})
     public ResultEntity<IPageBean<UserToken>> selectPageBeanAll(@RequestBody JSONObject jsonObject) throws Exception {
         return ResultEntity.success();
     }

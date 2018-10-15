@@ -7,7 +7,7 @@
     <groupId>io.github.tdwu</groupId>
     <artifactId>japi</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 
     <name>japi</name>
     <url>git@github.com:tdwu/japi.git</url>

@@ -19,9 +19,17 @@ public class ArrayResolver implements BaseResolver {
 
     @Override
     public TypeInfo resolved(Type type, ModelProvider modelProvider, ResolverType lastNode) {
-        TypeInfo typeInfo = new TypeInfo(config.getClassName(type, lastNode), "Array");
+        String className = type.getTypeName().replace("[]", "");
+        TypeInfo typeInfo = new TypeInfo(type.getTypeName(), "[]");
+        typeInfo.setType("$" + className);
         modelProvider.addTypeInfo(typeInfo);
-        typeInfo.setType("$" + type.getTypeName().replace("[]", ""));
+
+        try {
+            //对象继续处理
+            Class clazz = Class.forName(className);
+            modelProvider.addType(clazz, lastNode);
+        } catch (ClassNotFoundException e) {
+        }
 
         return typeInfo;
 
