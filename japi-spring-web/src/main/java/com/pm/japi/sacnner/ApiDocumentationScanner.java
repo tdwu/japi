@@ -173,6 +173,7 @@ public class ApiDocumentationScanner {
 
             // 处理type和引用的字段
             param.setType("$" + bean.type().getTypeName());
+
             if (StringUtils.isNotBlank(field)) {
                 try {
                     Field f = bean.type().getDeclaredField(field);
@@ -188,6 +189,8 @@ public class ApiDocumentationScanner {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }else{
+                modelProvider.addType(bean.type(), null);
             }
 
             paramMap.put(param.getName(), param);
