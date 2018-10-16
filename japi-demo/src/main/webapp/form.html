@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+</head>
+<body>
+<form method="post" action="./saveForm">
+    <input type="text" name="name" value="abc"/>
+    <input type="checkbox" name="tags" value="1" checked>1
+    <input type="checkbox" name="tags" value="2"/>2
+    <input type="checkbox" name="tags" value="3" checked/>3
+
+    <input  type="checkbox"  name="menuIds[0]" />0
+    <input  type="checkbox"  name="menuIds[1]" checked/>1
+    <input  type="checkbox"  name="menuIds[2]" checked />2
+
+    <button type="submit">原始提交</button>
+</form>
+
+<button id="ajaxSer"> ajax form</button>
+
+<button id="ajaxObject"> ajax default</button>
+<button id="ajaxJson"> ajax json</button>
+
+<button id="ajaxJsonStr"> ajax json str</button>
+<button id="ajaxJsonInBody"> ajax json In Body</button>
+
+<script>
+    //【Content-Type一般有这三种】
+    // x-www-form-urlencoded：数据被编码为名称/值对。这是标准的编码格式【默认的】,注意key=value，方式会转码
+    // multipart/form-data：数据被编码为一条消息，页上的每个控件对应消息中的一个部分。
+    // text/plain:数据以纯文本形式(text/json/xml/html)进行编码，其中不含任何控件或格式字符。postman软件里标的是RAW。
+
+    //form的enctype属性为编码方式，常用有两种：application/x-www-form-urlencoded和multipart/form-data，默认为application/x-www-form-urlencoded
+
+    var jsonObj={name:'abc',tags:["1","2"],user:{id:123,name:'wtd',score:[100,80,90]}};
+
+    $(document).ready(function(){
+        console.log($("form").serialize());
+        // 和表单submit一样
+        //name=abc&tags=1&tags=3
+        $("#ajaxSer").click(function () {
+            $.ajax({type: "POST", url: "./ajaxSer",  data:$("form").serialize()});
+        });
+
+        // 下面2个都一样，加了个dataType:json 返回时自动把json字符串转换成json对象进行回调
+        //data 中的数据，自动转换为key=value的方式
+        //name=abc&tags[]=1&tags[]=2&user[id]=123&user[name]=wtd&user[score][]=100&user[score][]=80&user[score][]=90
+        $("#ajaxDefault").click(function () {
+            $.ajax({type: "POST", url: "./ajaxDefault", data: jsonObj});
+        });
+        //name=abc&tags[]=1&tags[]=2&user[id]=123&user[name]=wtd&user[score][]=100&user[score][]=80&user[score][]=90
+        $("#ajaxJson").click(function () {
+            $.ajax({type: "POST", url: "./ajaxJson",dataType: "json", data:jsonObj});
+        });
+
+
+        // body中是json字符串
+        //{"name":"abc","tags":["1","2"],"user":{"id":123,"name":"wtd","score":[100,80,90]}}
+        $("#ajaxJsonStr").click(function () {
+            $.ajax({type: "POST", url: "./ajaxJsonStr",data:jsonObj});
+        });
+        $("#ajaxJsonInBody").click(function () {
+            $.ajax({type: "POST", url: "./ajaxJsonInBody",contentType:"application/json", data: JSON.stringify(jsonObj)});
+        });
+    });
+</script>
+
+</body>
+</html>
