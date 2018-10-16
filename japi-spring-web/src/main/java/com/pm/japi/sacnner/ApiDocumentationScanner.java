@@ -176,7 +176,7 @@ public class ApiDocumentationScanner {
 
             if (StringUtils.isNotBlank(field)) {
                 try {
-                    Field f = bean.type().getDeclaredField(field);
+                    Field f = bean.type().getField(field);
                     if (StringUtils.isBlank(param.getNote())) {
                         ApiNote apiNote = f.getAnnotation(ApiNote.class);
                         if (apiNote != null) {

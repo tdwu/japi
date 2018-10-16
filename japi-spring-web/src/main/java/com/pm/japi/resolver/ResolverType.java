@@ -46,7 +46,7 @@ public class ResolverType {
 
 
     public List<FieldInfo> getTypeField() {
-        List<Method> list = Arrays.asList(clazz.getDeclaredMethods());
+        List<Method> list = Arrays.asList(clazz.getMethods());
 
         List<FieldInfo> methodList = new ArrayList<FieldInfo>(list.size() / 2);
         list.forEach(p -> {
@@ -76,7 +76,7 @@ public class ResolverType {
                 String fieldName = methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
                 FieldInfo fieldInfo = new FieldInfo(fieldName, clazz, p);
                 try {
-                    Field field = clazz.getDeclaredField(fieldName);
+                    Field field = clazz.getField(fieldName);
                     fieldInfo.setField(field);
                 } catch (NoSuchFieldException e) {
 
