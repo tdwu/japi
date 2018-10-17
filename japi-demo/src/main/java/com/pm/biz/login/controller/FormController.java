@@ -2,6 +2,7 @@ package com.pm.biz.login.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.pm.biz.login.model.DataVo;
+import com.pm.biz.login.model.UserVo;
 import com.pm.biz.login.model.base.ResultEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,12 @@ public class FormController {
     public ResultEntity ajaxJson(String name, @RequestParam("tags[]") List<String> tags) {
         return ResultEntity.success();
     }
+
+    @RequestMapping(value = {"/ajaxListUser"})
+    public ResultEntity ajaxListUser(DataVo vo) {
+        return ResultEntity.success();
+    }
+
 
     @RequestMapping(value = {"/ajaxJsonStr"})
     public ResultEntity ajaxJsonStr(@RequestBody DataVo vo) {

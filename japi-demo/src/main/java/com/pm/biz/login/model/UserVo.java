@@ -5,10 +5,18 @@ import java.util.List;
 import java.util.Map;
 
 public class UserVo {
+    private String id;
     private String name;
     private List<String> score;
     private Map<String,Object> user;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

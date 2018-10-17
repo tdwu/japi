@@ -46,6 +46,7 @@ public class ResolverType {
 
 
     public List<FieldInfo> getTypeField() {
+        //public的方法，包括父类的
         List<Method> list = Arrays.asList(clazz.getMethods());
 
         List<FieldInfo> methodList = new ArrayList<FieldInfo>(list.size() / 2);
@@ -75,17 +76,42 @@ public class ResolverType {
                 }
                 String fieldName = methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
                 FieldInfo fieldInfo = new FieldInfo(fieldName, clazz, p);
-                try {
-                    Field field = clazz.getField(fieldName);
-                    fieldInfo.setField(field);
-                } catch (NoSuchFieldException e) {
 
-                }
+                Field field = getField(clazz, fieldName);
+                fieldInfo.setField(field);
+
+
                 methodList.add(fieldInfo);
             }
         });
 
         return methodList;
+    }
+    /***
+     * getField
+     * 获取一个类的 ==public成员变量，包括基类== 。
+     *
+     * getDeclaredField
+     *
+     * 获取一个类的 ==所有成员变量，不包括基类== 。
+     */
+    public static Field getField(Class clazz, String name) {
+        Field field = null;
+        try {
+            //先获取自己的,所有,不包括parent的
+            field = clazz.getDeclaredField(name);
+        } catch (NoSuchFieldException e) {
+
+        }
+        if (field == null) {
+            try {
+                //包括基类== ,包括public的
+                field = clazz.getField(name);
+            } catch (NoSuchFieldException e) {
+
+            }
+        }
+        return field;
     }
 
 }

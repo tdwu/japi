@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user/info")
-@Api(value = "个人信息", tags = "演示", module = "测试-用户模块")
+@Api(value = "个人信息", tags = "演示", module = "2 测试-用户模块")
 public class UserController {
 
-    @ApiMethod(value = "获取用户信息1", note = "演示内容：1 参数数组 2 级联数组 3 属性对象引用描述（如leader字段）4 返回数组", params = {
+    @ApiMethod(value = "获取用户信息1",order = 1,note = "演示内容：1 参数数组 2 级联数组 3 属性对象引用描述（如leader字段）4 返回数组", params = {
             @ApiParam(value = "money", type = double.class)
             , @ApiParam("user.name"), @ApiParam("user.score[].name"), @ApiParam("user.score[].value")
             , @ApiParam(value = "user.imgs[]", note = "图片地址")
@@ -28,7 +28,7 @@ public class UserController {
         return ResultEntity.success();
     }
 
-    @ApiMethod(value = "获取用户信息2", note = "演示内容：1 参数 引用某个java Bean中的个字段 2 级联参数 引用javaBean中的字段 3 级联参数，直接引用javaBean"
+    @ApiMethod(value = "获取用户信息2",order = 2,note = "演示内容：1 参数 引用某个java Bean中的个字段 2 级联参数 引用javaBean中的字段 3 级联参数，直接引用javaBean"
             , params = {@ApiParam(value = "$sex", type = UserInfo.class, note = "引用bean里面的一个字段")
             , @ApiParam(value = "sex1 ", type = UserSex.class)
             , @ApiParam(value = "user.$sex", type = UserInfo.class, note = "引用bean里面的一个字段")

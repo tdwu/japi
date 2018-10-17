@@ -5,6 +5,7 @@ import com.pm.japi.annotations.ApiMethod;
 import com.pm.japi.annotations.ApiNote;
 import com.pm.japi.annotations.ApiParam;
 import com.pm.japi.model.*;
+import com.pm.japi.resolver.ResolverType;
 import com.pm.japi.spring.handler.WebRequestHandler;
 import com.pm.japi.spring.provider.WebRequestHandlerProvider;
 import com.pm.japi.utils.PathUtils;
@@ -17,6 +18,7 @@ import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.*;
+
 
 public class ApiDocumentationScanner {
 
@@ -31,9 +33,6 @@ public class ApiDocumentationScanner {
         Map<String, ApiInfo> apiMap = new HashMap<String, ApiInfo>();
         ModelProvider modelProvider = new ModelProvider();
         list.stream().filter(p -> p.isAnnotatedWith(ApiMethod.class)).forEach(p -> {
-            /*ApiMethod apiMethod = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getMethod(), ApiMethod.class);
-            RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getMethod(), RequestMapping.class);
-            PostMapping post = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getMethod(), PostMapping.class);*/
 
             //方法上的注解
             ApiMethod apiMethod = p.getHandlerMethod().getMethod().getAnnotation(ApiMethod.class);
@@ -63,6 +62,7 @@ public class ApiDocumentationScanner {
 
             method.setName(apiMethod.value());
             method.setNote(apiMethod.note());
+            method.setOrder(apiMethod.order());
 
             //请求的参数
             List<ApiParam> apiParamList = Arrays.asList(apiMethod.params());
@@ -84,6 +84,7 @@ public class ApiDocumentationScanner {
                 apiInfo.setName(api.value());
                 apiInfo.setHidden(api.hidden());
                 apiInfo.setTags(api.tags());
+                apiInfo.setOrder(api.order());
 
                 apiMap.put(apiClassName, apiInfo);
             } else {
@@ -113,6 +114,8 @@ public class ApiDocumentationScanner {
 
         // 在document中，添加接口参数的数据模型
         Map<String, Module> moduleMap = new HashMap<String, Module>();
+
+        //把所有api，组装到module中
         apiMap.entrySet().forEach(p -> {
             ApiInfo apiInfo = p.getValue();
             Module module = moduleMap.get(apiInfo.getModule());
@@ -125,6 +128,26 @@ public class ApiDocumentationScanner {
             }
             module.getApiList().add(apiInfo);
         });
+
+
+        apiDocument.getModuleList().forEach(module -> {
+            module.getApiList().forEach(api -> {
+                //方法接口排序
+                api.getMethodList().sort((a, b) -> {
+                    return a.getOrder() - b.getOrder();
+                });
+            });
+            //api排序
+            module.getApiList().sort((a, b) -> {
+                return a.getOrder() - b.getOrder();
+            });
+        });
+
+        //module 排序
+        apiDocument.getModuleList().sort((a, b) -> {
+            return a.getName().compareTo(b.getName());
+        });
+
         apiDocument.setDefines(modelProvider.getTypeMap());
         return apiDocument;
     }
@@ -175,21 +198,18 @@ public class ApiDocumentationScanner {
             param.setType("$" + bean.type().getTypeName());
 
             if (StringUtils.isNotBlank(field)) {
-                try {
-                    Field f = bean.type().getField(field);
-                    if (StringUtils.isBlank(param.getNote())) {
-                        ApiNote apiNote = f.getAnnotation(ApiNote.class);
-                        if (apiNote != null) {
-                            param.setNote(apiNote.value());
-                        }
+                Field f = ResolverType.getField(bean.type(), field);
+                if (StringUtils.isBlank(param.getNote())) {
+                    ApiNote apiNote = f.getAnnotation(ApiNote.class);
+                    if (apiNote != null) {
+                        param.setNote(apiNote.value());
                     }
-                    //设置真正的数据类型,如果是其他bean，不会递归处理，由界面处理
-                    param.setType("$" + f.getGenericType().getTypeName());
-                    modelProvider.addType(f.getGenericType(), null);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }else{
+                //设置真正的数据类型,如果是其他bean，不会递归处理，由界面处理
+                param.setType("$" + f.getGenericType().getTypeName());
+                modelProvider.addType(f.getGenericType(), null);
+
+            } else {
                 modelProvider.addType(bean.type(), null);
             }
 

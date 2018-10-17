@@ -12,5 +12,8 @@ public @interface Api {
     String value() default "";//【名称】
 
     String[] tags() default "";
+
     boolean hidden() default false;
+
+    int order() default 0;
 }

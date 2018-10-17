@@ -11,6 +11,7 @@ public class ApiInfo {
     private String[] tags;
     private boolean hidden;
     private List<Method> methodList = new ArrayList<Method>();
+    private int order;
 
     public String getModule() {
         return module;
@@ -59,6 +60,14 @@ public class ApiInfo {
 
     public void setMethodList(List<Method> methodList) {
         this.methodList = methodList;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 }
 

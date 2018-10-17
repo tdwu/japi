@@ -6,6 +6,7 @@ public class DataVo {
     private String name;
     private List<String> tags;
     private UserVo user;//如果是ajax提交的form格式，则会失败，除非text/plain
+    private List<UserVo> userList;//如果是ajax提交的form格式，则会失败，除非text/plain
 
     private List<String> menuIds;//数组有3个，但没选中的index，会为null
 
@@ -32,5 +33,21 @@ public class DataVo {
 
     public void setMenuIds(List<String> menuIds) {
         this.menuIds = menuIds;
+    }
+
+    public UserVo getUser() {
+        return user;
+    }
+
+    public void setUser(UserVo user) {
+        this.user = user;
+    }
+
+    public List<UserVo> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<UserVo> userList) {
+        this.userList = userList;
     }
 }

@@ -12,6 +12,8 @@ public class Method {
     private String returnType;
     private List<Param> resultList = null;//对returnType的描述
 
+    private int order;
+
     public String getPath() {
         return path;
     }
@@ -76,6 +78,14 @@ public class Method {
         this.resultList = resultList;
     }
 
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
     public Method clone() {
         Method fMethod = new Method();
         fMethod.setType(this.getType());
@@ -85,6 +95,7 @@ public class Method {
         fMethod.setParamList(this.getParamList());
         fMethod.setReturnType(this.getReturnType());
         fMethod.setResultList(this.getResultList());
+        fMethod.setOrder(this.getOrder());
         return fMethod;
     }
 

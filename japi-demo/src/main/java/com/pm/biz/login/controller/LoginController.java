@@ -15,7 +15,7 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/api/user/info")
-@Api(value = "登录", tags = "演示", module = "测试-用户模块")
+@Api(value = "登录", tags = "演示", module = "1 测试-用户模块")
 public class LoginController {
 
 

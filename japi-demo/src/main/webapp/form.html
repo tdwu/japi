@@ -24,6 +24,8 @@
 <button id="ajaxObject"> ajax default</button>
 <button id="ajaxJson"> ajax json</button>
 
+<button id="ajaxListUser"> ajax json listUser</button>
+
 <button id="ajaxJsonStr"> ajax json str</button>
 <button id="ajaxJsonInBody"> ajax json In Body</button>
 
@@ -54,6 +56,12 @@
         //name=abc&tags[]=1&tags[]=2&user[id]=123&user[name]=wtd&user[score][]=100&user[score][]=80&user[score][]=90
         $("#ajaxJson").click(function () {
             $.ajax({type: "POST", url: "./ajaxJson",dataType: "json", data:jsonObj});
+        });
+
+
+        //userList[0][id]=1&userList[0][name]=zs&userList[1][id]=2&userList[1][name]=ls
+        $("#ajaxListUser").click(function () {
+            $.ajax({type: "POST", url: "./ajaxListUser",dataType: "json", data:{userList:[{id:1,name:'zs'},{id:2,name:'ls'}]}});
         });
 
 

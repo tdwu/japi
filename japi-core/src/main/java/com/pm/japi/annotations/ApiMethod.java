@@ -21,5 +21,7 @@ public @interface ApiMethod {
     //返回参数
     ApiParam[] result() default @ApiParam();
 
+    int order() default 0;
+
 
 }
