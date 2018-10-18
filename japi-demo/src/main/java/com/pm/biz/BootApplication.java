@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {
-        "com.pm.japi.*.boot",
+        "com.pm.biz.config",
         "com.pm.biz.login.controller",})
 public class BootApplication {
     public static void main(String[] args) {

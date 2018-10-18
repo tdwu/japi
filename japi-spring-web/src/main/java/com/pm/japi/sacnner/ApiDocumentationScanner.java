@@ -24,6 +24,11 @@ public class ApiDocumentationScanner {
 
     @Resource
     private WebRequestHandlerProvider requestHandlerProvider;
+    private ApiConfigInfo apiConfigInfo;
+
+    public ApiDocumentationScanner(ApiConfigInfo configInfo) {
+        this.apiConfigInfo = configInfo;
+    }
 
     public ApiDocument scanDocument() {
         ApiDocument apiDocument = new ApiDocument();
@@ -61,6 +66,7 @@ public class ApiDocumentationScanner {
             method.setType(mdStr);
 
             method.setName(apiMethod.value());
+            method.setMarkDown(apiMethod.markDown());
             method.setNote(apiMethod.note());
             method.setOrder(apiMethod.order());
 
@@ -82,6 +88,7 @@ public class ApiDocumentationScanner {
                 apiInfo = new ApiInfo();
                 apiInfo.setModule(api.module());
                 apiInfo.setName(api.value());
+                apiInfo.setMarkDown(api.markDown());
                 apiInfo.setHidden(api.hidden());
                 apiInfo.setTags(api.tags());
                 apiInfo.setOrder(api.order());
@@ -130,7 +137,39 @@ public class ApiDocumentationScanner {
         });
 
 
-        apiDocument.getModuleList().forEach(module -> {
+        this.moduleSort(apiDocument.getModuleList());
+        this.tryAddSysMarkDown(apiDocument);
+
+        apiDocument.setDefines(modelProvider.getTypeMap());
+        apiDocument.setConfig(apiConfigInfo);
+        return apiDocument;
+    }
+
+    private void tryAddSysMarkDown(ApiDocument apiDocument) {
+
+        if (StringUtils.isNotBlank(apiConfigInfo.getReadMe())) {
+            Module module = new Module();
+            module.setName("简介");
+            module.setMarkDown("");
+            apiDocument.getModuleList().add(0,module);
+
+            ApiInfo apiInfo = new ApiInfo();
+            apiInfo.setName("介绍");
+            apiInfo.setMarkDown("");
+            module.getApiList().add(apiInfo);
+
+            Method method = new Method();
+            method.setMarkDown(apiConfigInfo.getReadMe());
+            method.setName("ReadMe");
+            apiInfo.getMethodList().add(method);
+
+
+        }
+    }
+
+    private void moduleSort(List<Module> moduleList) {
+
+        moduleList.forEach(module -> {
             module.getApiList().forEach(api -> {
                 //方法接口排序
                 api.getMethodList().sort((a, b) -> {
@@ -144,13 +183,11 @@ public class ApiDocumentationScanner {
         });
 
         //module 排序
-        apiDocument.getModuleList().sort((a, b) -> {
+        moduleList.sort((a, b) -> {
             return a.getName().compareTo(b.getName());
         });
-
-        apiDocument.setDefines(modelProvider.getTypeMap());
-        return apiDocument;
     }
+
 
     private List<Param> parse(ModelProvider modelProvider, List<ApiParam> apiParamList) {
 
@@ -219,7 +256,7 @@ public class ApiDocumentationScanner {
         return paramList;
     }
 
-    public Param checkParent(Map<String, Param> paramMap, List<Param> paramList, String path, Param child) {
+    private Param checkParent(Map<String, Param> paramMap, List<Param> paramList, String path, Param child) {
         //是否有节点
         if (paramMap.get(path) == null) {
             //没有

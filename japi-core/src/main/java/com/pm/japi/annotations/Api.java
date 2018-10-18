@@ -15,5 +15,7 @@ public @interface Api {
 
     boolean hidden() default false;
 
+    String markDown() default "";
+
     int order() default 0;
 }

@@ -44,6 +44,15 @@
                     <include>**/**</include>
                 </includes>
             </resource>
+            <!-- 打包时将静态资源打包进去-->
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 静态资源到跟目录-->
+                <includes>
+                    <include>**/**</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
         </resources>
     </build>
 

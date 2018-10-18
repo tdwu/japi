@@ -1,5 +1,6 @@
 package com.pm.japi.spring.boot;
 
+import com.pm.japi.model.ApiConfigInfo;
 import com.pm.japi.sacnner.ApiDocumentationScanner;
 import com.pm.japi.spring.provider.WebRequestHandlerProvider;
 import com.pm.japi.spring.web.JApiController;
@@ -12,6 +13,12 @@ import java.util.List;
 @Configuration
 public class JApiConfigurer {
 
+    @Bean
+    public ApiConfigInfo apiConfigInfo(){
+        return new ApiConfigInfo();
+    }
+
+
     @Bean("requestHandlerProvider")
     public WebRequestHandlerProvider requestHandlerProvider(List<RequestMappingInfoHandlerMapping> list){
         WebRequestHandlerProvider bean=new WebRequestHandlerProvider();
@@ -21,7 +28,7 @@ public class JApiConfigurer {
 
     @Bean
     public ApiDocumentationScanner documentationScanner(){
-        return new ApiDocumentationScanner();
+        return new ApiDocumentationScanner(this.apiConfigInfo());
     }
 
 

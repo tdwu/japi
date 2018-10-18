@@ -5,6 +5,7 @@ import java.util.List;
 public class Method {
     private String path;
     private String name;
+    private String markDown;
     private String note;
     private String type;//方法名称,Post,Get 等
     private String paramType;
@@ -28,6 +29,14 @@ public class Method {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getMarkDown() {
+        return markDown;
+    }
+
+    public void setMarkDown(String markDown) {
+        this.markDown = markDown;
     }
 
     public String getType() {
@@ -96,6 +105,7 @@ public class Method {
         fMethod.setReturnType(this.getReturnType());
         fMethod.setResultList(this.getResultList());
         fMethod.setOrder(this.getOrder());
+        fMethod.setMarkDown(this.getMarkDown());
         return fMethod;
     }
 

@@ -11,28 +11,11 @@ import java.util.Map;
 
 public class ApiDocument implements Serializable {
 
-    private  String groupName;
-    private  String basePath;
+    private ApiConfigInfo config;
 
-    private List<Module> moduleList=new ArrayList<Module>();
+    private List<Module> moduleList = new ArrayList<Module>();
 
     public Map<String, TypeInfo> defines = new HashMap<String, TypeInfo>();
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    public String getBasePath() {
-        return basePath;
-    }
-
-    public void setBasePath(String basePath) {
-        this.basePath = basePath;
-    }
 
     public List<Module> getModuleList() {
         return moduleList;
@@ -48,5 +31,13 @@ public class ApiDocument implements Serializable {
 
     public void setDefines(Map<String, TypeInfo> defines) {
         this.defines = defines;
+    }
+
+    public ApiConfigInfo getConfig() {
+        return config;
+    }
+
+    public void setConfig(ApiConfigInfo config) {
+        this.config = config;
     }
 }

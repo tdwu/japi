@@ -11,6 +11,9 @@ public @interface ApiMethod {
 
     String note() default "";
 
+
+    String markDown() default "";
+
     Class paramType() default ApiMethod.class;//默认一个类型，这个类型不可能作为一个真实的数据类型
 
     //请求参数
