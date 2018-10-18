@@ -11,7 +11,7 @@ public class ApiConfigInfo {
     private String basePath = "";//接口地址
     @Value("${japi.web-site:http://www.pmwangluo.com}")
     private String webSite;//公司站点
-    @Value("${japi.read-me:}")
+    @Value("${japi.read-me:tdwu.md}")
     private String readMe;
     @Value("${japi.mark-down:1}")
     private int markDown = 1;//0 不显示mark down 1 只显示mark down， 2 markdown和接口描述都显示
