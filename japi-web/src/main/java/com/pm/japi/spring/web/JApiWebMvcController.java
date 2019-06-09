@@ -14,7 +14,7 @@ public class JApiWebMvcController {
     @Resource
     private ApiDocumentationScanner documentationScanner;
 
-    @RequestMapping("docs-json")
+    @RequestMapping("/docs-json")
     @ResponseBody
     public Object getDocumentation() {
         return documentationScanner.scanDocument();

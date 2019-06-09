@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.util.pattern.PathPattern;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
@@ -175,7 +176,7 @@ public class ApiDocumentationScanner {
             //方法上的注解
             ApiMethod apiMethod = p.getHandlerMethod().getMethod().getAnnotation(ApiMethod.class);
             org.springframework.web.reactive.result.method.RequestMappingInfo requestMapping = p.getRequestMapping();
-            String[] urls = requestMapping.getPatternsCondition().getPatterns().toArray(new String[0]);
+            PathPattern[] urls = requestMapping.getPatternsCondition().getPatterns().toArray(new PathPattern[0]);
 
             //由于spring注解中，path和value是别名关系，防止开发人员2种方式都在写，所以需要utils帮忙2边都有值
 
@@ -244,9 +245,9 @@ public class ApiDocumentationScanner {
                 method.setParamType(apiMethod.paramType().getTypeName());
             }
 
-            for (String url : urls) {
+            for (PathPattern url : urls) {
                 Method fMethod = method.clone();
-                fMethod.setPath(url);
+                fMethod.setPath(url.getPatternString());
                 //方法接口地址叠加
                 apiInfo.getMethodList().add(fMethod);
             }
