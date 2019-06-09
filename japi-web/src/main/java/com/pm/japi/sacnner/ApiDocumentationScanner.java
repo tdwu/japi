@@ -6,13 +6,15 @@ import com.pm.japi.annotations.ApiNote;
 import com.pm.japi.annotations.ApiParam;
 import com.pm.japi.model.*;
 import com.pm.japi.resolver.ResolverType;
-import com.pm.japi.spring.handler.WebRequestHandler;
-import com.pm.japi.spring.provider.WebRequestHandlerProvider;
+import com.pm.japi.spring.handler.WebFluxRequestHandler;
+import com.pm.japi.spring.handler.WebMvcRequestHandler;
+import com.pm.japi.spring.provider.WebFluxRequestHandlerProvider;
+import com.pm.japi.spring.provider.WebMvcRequestHandlerProvider;
 import com.pm.japi.utils.PathUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
@@ -22,8 +24,12 @@ import java.util.*;
 
 public class ApiDocumentationScanner {
 
-    @Resource
-    private WebRequestHandlerProvider requestHandlerProvider;
+    @Autowired(required = false)
+    private WebMvcRequestHandlerProvider webMvcRequestHandlerProvider;
+
+    @Autowired(required = false)
+    private WebFluxRequestHandlerProvider webFluxRequestHandlerProvider;
+
     private ApiConfigInfo apiConfigInfo;
 
     public ApiDocumentationScanner(ApiConfigInfo configInfo) {
@@ -32,16 +38,53 @@ public class ApiDocumentationScanner {
 
     public ApiDocument scanDocument() {
         ApiDocument apiDocument = new ApiDocument();
-        List<WebRequestHandler> list = requestHandlerProvider.getRequestHandlers();
+
 
         //处理method
         Map<String, ApiInfo> apiMap = new HashMap<String, ApiInfo>();
         ModelProvider modelProvider = new ModelProvider();
+        scanWebMvc(apiMap,modelProvider);
+        scanWebFlux(apiMap,modelProvider);
+
+        // 在document中，添加接口参数的数据模型
+        Map<String, Module> moduleMap = new HashMap<String, Module>();
+
+        //把所有api，组装到module中
+        apiMap.entrySet().forEach(p -> {
+            ApiInfo apiInfo = p.getValue();
+            Module module = moduleMap.get(apiInfo.getModule());
+            if (module == null) {
+                module = new Module();
+                module.setName(apiInfo.getModule());
+                moduleMap.put(module.getName(), module);
+
+                apiDocument.getModuleList().add(module);
+            }
+            module.getApiList().add(apiInfo);
+        });
+
+
+
+        this.moduleSort(apiDocument.getModuleList());
+        this.tryAddSysMarkDown(apiDocument);
+
+        apiDocument.setDefines(modelProvider.getTypeMap());
+        apiDocument.setConfig(apiConfigInfo);
+        return apiDocument;
+    }
+
+
+    private void scanWebMvc(Map<String, ApiInfo> apiMap, ModelProvider modelProvider) {
+        if(webMvcRequestHandlerProvider==null){
+            return;
+        }
+
+        List<WebMvcRequestHandler> list = webMvcRequestHandlerProvider.getRequestHandlers();
         list.stream().filter(p -> p.isAnnotatedWith(ApiMethod.class)).forEach(p -> {
 
             //方法上的注解
             ApiMethod apiMethod = p.getHandlerMethod().getMethod().getAnnotation(ApiMethod.class);
-            RequestMappingInfo requestMapping = p.getRequestMapping();
+            org.springframework.web.servlet.mvc.method.RequestMappingInfo requestMapping = p.getRequestMapping();
             String[] urls = requestMapping.getPatternsCondition().getPatterns().toArray(new String[0]);
 
             //由于spring注解中，path和value是别名关系，防止开发人员2种方式都在写，所以需要utils帮忙2边都有值
@@ -118,31 +161,96 @@ public class ApiDocumentationScanner {
                 apiInfo.getMethodList().add(fMethod);
             }
         });
+    }
 
-        // 在document中，添加接口参数的数据模型
-        Map<String, Module> moduleMap = new HashMap<String, Module>();
 
-        //把所有api，组装到module中
-        apiMap.entrySet().forEach(p -> {
-            ApiInfo apiInfo = p.getValue();
-            Module module = moduleMap.get(apiInfo.getModule());
-            if (module == null) {
-                module = new Module();
-                module.setName(apiInfo.getModule());
-                moduleMap.put(module.getName(), module);
+    private void scanWebFlux(Map<String, ApiInfo> apiMap, ModelProvider modelProvider) {
+        if(webFluxRequestHandlerProvider==null){
+            return;
+        }
 
-                apiDocument.getModuleList().add(module);
+        List<WebFluxRequestHandler> list = webFluxRequestHandlerProvider.getRequestHandlers();
+        list.stream().filter(p -> p.isAnnotatedWith(ApiMethod.class)).forEach(p -> {
+
+            //方法上的注解
+            ApiMethod apiMethod = p.getHandlerMethod().getMethod().getAnnotation(ApiMethod.class);
+            org.springframework.web.reactive.result.method.RequestMappingInfo requestMapping = p.getRequestMapping();
+            String[] urls = requestMapping.getPatternsCondition().getPatterns().toArray(new String[0]);
+
+            //由于spring注解中，path和value是别名关系，防止开发人员2种方式都在写，所以需要utils帮忙2边都有值
+
+
+            //获取方法对应的url
+            if (urls == null || urls.length == 0) {
+                return;
             }
-            module.getApiList().add(apiInfo);
+
+            Method method = new Method();
+            Set<RequestMethod> mds = requestMapping.getMethodsCondition().getMethods();
+            String mdStr = "";
+            for (RequestMethod rm : mds) {
+                if (StringUtils.isNotBlank(mdStr)) {
+                    mdStr = mdStr + "," + rm.name();
+                } else {
+                    mdStr = mdStr + "  " + rm.name();
+                }
+            }
+
+            method.setType(mdStr);
+
+            method.setName(apiMethod.value());
+            method.setMarkDown(apiMethod.markDown());
+            method.setNote(apiMethod.note());
+            method.setOrder(apiMethod.order());
+
+            //请求的参数
+            List<ApiParam> apiParamList = Arrays.asList(apiMethod.params());
+            List<Param> paramList = parse(modelProvider, apiParamList);
+            method.setParamList(paramList);
+
+            //返回的参数
+            List<ApiParam> apiResultList = Arrays.asList(apiMethod.result());
+            List<Param> resultList = parse(modelProvider, apiResultList);
+            method.setResultList(resultList);
+
+            //Controller上的api描述
+            Api api = AnnotatedElementUtils.findMergedAnnotation(p.getHandlerMethod().getBeanType(), Api.class);
+            String apiClassName = p.getHandlerMethod().getBeanType().getName();
+            ApiInfo apiInfo = apiMap.get(apiClassName);
+            if (apiInfo == null) {
+                apiInfo = new ApiInfo();
+                apiInfo.setModule(api.module());
+                apiInfo.setName(api.value());
+                apiInfo.setMarkDown(api.markDown());
+                apiInfo.setHidden(api.hidden());
+                apiInfo.setTags(api.tags());
+                apiInfo.setOrder(api.order());
+
+                apiMap.put(apiClassName, apiInfo);
+            } else {
+                apiMap.get(apiClassName);
+            }
+
+
+            //返回参数类型处理
+            Type returnType = p.getHandlerMethod().getMethod().getGenericReturnType();
+            modelProvider.addType(returnType, null);
+            method.setReturnType(returnType.getTypeName());
+
+            //处理请求的参数类型
+            if (!ApiMethod.class.equals(apiMethod.paramType())) {
+                //不是默认的，说明是设置过的，则需要处理
+                modelProvider.addType(apiMethod.paramType(), null);
+                method.setParamType(apiMethod.paramType().getTypeName());
+            }
+
+            for (String url : urls) {
+                Method fMethod = method.clone();
+                fMethod.setPath(url);
+                //方法接口地址叠加
+                apiInfo.getMethodList().add(fMethod);
+            }
         });
-
-
-        this.moduleSort(apiDocument.getModuleList());
-        this.tryAddSysMarkDown(apiDocument);
-
-        apiDocument.setDefines(modelProvider.getTypeMap());
-        apiDocument.setConfig(apiConfigInfo);
-        return apiDocument;
     }
 
     private void tryAddSysMarkDown(ApiDocument apiDocument) {
@@ -151,7 +259,7 @@ public class ApiDocumentationScanner {
             Module module = new Module();
             module.setName("简介");
             module.setMarkDown("");
-            apiDocument.getModuleList().add(0,module);
+            apiDocument.getModuleList().add(0, module);
 
             ApiInfo apiInfo = new ApiInfo();
             apiInfo.setName("介绍");

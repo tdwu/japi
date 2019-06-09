@@ -16,6 +16,8 @@ server:
       init-parameters:
         development: true
 
+japi:
+  enabled: true
 
 spring:
   application:
@@ -30,6 +32,7 @@ spring:
   mvc:
     static-path-pattern: /**
     throw-exception-if-no-handler-found: true
+
 
 
 # 日志配置

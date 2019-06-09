@@ -4,20 +4,20 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.condition.NameValueExpression;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.reactive.result.condition.NameValueExpression;
+import org.springframework.web.reactive.result.condition.PatternsRequestCondition;
+import org.springframework.web.reactive.result.method.RequestMappingInfo;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 import java.util.Set;
 
-public class WebRequestHandler {
+public class WebFluxRequestHandler {
 
     private final RequestMappingInfo requestMapping;
     private final HandlerMethod handlerMethod;
 
-    public WebRequestHandler(RequestMappingInfo requestMapping, HandlerMethod handlerMethod) {
+    public WebFluxRequestHandler(RequestMappingInfo requestMapping, HandlerMethod handlerMethod) {
         this.requestMapping = requestMapping;
         this.handlerMethod = handlerMethod;
     }

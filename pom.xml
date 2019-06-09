@@ -7,7 +7,7 @@
     <groupId>io.github.tdwu</groupId>
     <artifactId>japi</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
 
     <name>japi</name>
     <url>git@github.com:tdwu/japi.git</url>
@@ -47,8 +47,9 @@
 
     <modules>
         <module>japi-core</module>
-        <module>japi-spring-web</module>
+        <module>japi-web</module>
         <module>japi-ui</module>
+        <module>japi-starter</module>
         <module>japi-demo</module>
     </modules>
 
@@ -60,6 +61,14 @@
                 <artifactId>spring-webmvc</artifactId>
                 <version>5.0.5.RELEASE</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webflux</artifactId>
+                <version>5.0.5.RELEASE</version>
+            </dependency>
+
+
 
             <dependency>
                 <groupId>org.apache.commons</groupId>

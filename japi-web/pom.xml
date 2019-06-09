@@ -5,12 +5,12 @@
     <parent>
         <artifactId>japi</artifactId>
         <groupId>io.github.tdwu</groupId>
-        <version>0.0.4</version>
+        <version>0.0.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>japi-spring-web</artifactId>
+    <artifactId>japi-web</artifactId>
 
     <dependencies>
         <dependency>
@@ -18,9 +18,16 @@
             <artifactId>japi-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
             <scope>compile</scope>
         </dependency>
 

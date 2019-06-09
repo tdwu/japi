@@ -4,7 +4,8 @@
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/japi-core" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/japi-demo" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/japi-spring-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/japi-starter" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/japi-ui" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/japi-web" charset="UTF-8" />
   </component>
 </project>
