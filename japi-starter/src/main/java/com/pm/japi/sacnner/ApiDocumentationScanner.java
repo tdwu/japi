@@ -12,13 +12,16 @@ import com.pm.japi.spring.provider.WebFluxRequestHandlerProvider;
 import com.pm.japi.spring.provider.WebMvcRequestHandlerProvider;
 import com.pm.japi.utils.PathUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.pattern.PathPattern;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -44,8 +47,8 @@ public class ApiDocumentationScanner {
         //处理method
         Map<String, ApiInfo> apiMap = new HashMap<String, ApiInfo>();
         ModelProvider modelProvider = new ModelProvider();
-        scanWebMvc(apiMap,modelProvider);
-        scanWebFlux(apiMap,modelProvider);
+        scanWebMvc(apiMap, modelProvider);
+        scanWebFlux(apiMap, modelProvider);
 
         // 在document中，添加接口参数的数据模型
         Map<String, Module> moduleMap = new HashMap<String, Module>();
@@ -65,7 +68,6 @@ public class ApiDocumentationScanner {
         });
 
 
-
         this.moduleSort(apiDocument.getModuleList());
         this.tryAddSysMarkDown(apiDocument);
 
@@ -76,7 +78,7 @@ public class ApiDocumentationScanner {
 
 
     private void scanWebMvc(Map<String, ApiInfo> apiMap, ModelProvider modelProvider) {
-        if(webMvcRequestHandlerProvider==null){
+        if (webMvcRequestHandlerProvider == null) {
             return;
         }
 
@@ -166,7 +168,7 @@ public class ApiDocumentationScanner {
 
 
     private void scanWebFlux(Map<String, ApiInfo> apiMap, ModelProvider modelProvider) {
-        if(webFluxRequestHandlerProvider==null){
+        if (webFluxRequestHandlerProvider == null) {
             return;
         }
 
@@ -235,6 +237,8 @@ public class ApiDocumentationScanner {
 
             //返回参数类型处理
             Type returnType = p.getHandlerMethod().getMethod().getGenericReturnType();
+            // 【重要】去掉Mono Just
+            returnType = putOff(modelProvider, returnType);
             modelProvider.addType(returnType, null);
             method.setReturnType(returnType.getTypeName());
 
@@ -252,6 +256,17 @@ public class ApiDocumentationScanner {
                 apiInfo.getMethodList().add(fMethod);
             }
         });
+    }
+
+    private Type putOff(ModelProvider modelProvider, Type type) {
+
+        if (type.getTypeName().startsWith(Mono.class.getName())
+                || type.getTypeName().startsWith(Flux.class.getName())) {
+            if (type instanceof ParameterizedType) {
+                type = ((ParameterizedType) type).getActualTypeArguments()[0];
+            }
+        }
+        return type;
     }
 
     private void tryAddSysMarkDown(ApiDocument apiDocument) {

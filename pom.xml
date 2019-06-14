@@ -7,11 +7,11 @@
     <groupId>io.github.tdwu</groupId>
     <artifactId>japi</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
 
     <name>japi</name>
     <url>git@github.com:tdwu/japi.git</url>
-    <description>类似于Swagger 的文档辅助工具 </description>
+    <description>类似于Swagger 的文档辅助工具</description>
 
     <licenses>
         <license>
@@ -47,10 +47,11 @@
 
     <modules>
         <module>japi-core</module>
-        <module>japi-web</module>
-        <module>japi-ui</module>
         <module>japi-starter</module>
         <module>japi-demo</module>
+        <!-- <module>japi-web</module>
+         <module>japi-ui</module>
+       -->
     </modules>
 
 
@@ -67,7 +68,6 @@
                 <artifactId>spring-webflux</artifactId>
                 <version>5.0.5.RELEASE</version>
             </dependency>
-
 
 
             <dependency>

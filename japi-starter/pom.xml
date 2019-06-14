@@ -5,7 +5,7 @@
     <parent>
         <artifactId>japi</artifactId>
         <groupId>io.github.tdwu</groupId>
-        <version>0.0.5</version>
+        <version>0.0.6</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -26,10 +26,29 @@
             <version>2.1.5.RELEASE</version>
         </dependency>
 
+
         <dependency>
             <groupId>io.github.tdwu</groupId>
-            <artifactId>japi-ui</artifactId>
-            <version>0.0.5</version>
+            <artifactId>japi-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

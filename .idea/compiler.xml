@@ -6,13 +6,16 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="japi-demo" />
+        <module name="spring-boot-starter-japi" />
         <module name="japi-starter" />
         <module name="japi-core" />
-        <module name="japi-web" />
-        <module name="japi-ui" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="japi-demo" target="1.8" />
+      <module name="japi-ui" target="1.8" />
+      <module name="japi-web" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
