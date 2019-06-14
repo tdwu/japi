@@ -48,8 +48,9 @@
     <modules>
         <module>japi-core</module>
         <module>japi-starter</module>
-        <module>japi-demo</module>
-        <!-- <module>japi-web</module>
+        <!--
+         <module>japi-demo</module>
+         <module>japi-web</module>
          <module>japi-ui</module>
        -->
     </modules>
