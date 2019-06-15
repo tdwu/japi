@@ -7,7 +7,7 @@
     <groupId>io.github.tdwu</groupId>
     <artifactId>japi</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.6</version>
+    <version>0.1.0</version>
 
     <name>japi</name>
     <url>git@github.com:tdwu/japi.git</url>
@@ -42,6 +42,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <version>0.1.1</version>
     </properties>
 
 
