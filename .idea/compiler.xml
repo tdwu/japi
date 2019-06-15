@@ -6,9 +6,9 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="spring-boot-starter-japi" />
         <module name="japi-starter" />
         <module name="japi-core" />
+        <module name="spring-boot-starter-japi" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
